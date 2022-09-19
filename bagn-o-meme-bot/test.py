@@ -9,10 +9,17 @@ import time
 from dotenv import load_dotenv
 load_dotenv()
 
+# Using intents, we need to be able to read message_contents
 intents = discord.Intents.default()
 intents.message_content = True 
 
-client = discord.Client(intents=intents)
+# Activity to indicate shitshow 
+# It either works as activity param set 
+# client = discord.Client(intents=intents, activity=discord.Game(name='The Meme Game'))
+# Or
+# Setting activity manually 
+activity = discord.Activity(name='YOU, bitch 0.o', type=discord.ActivityType.watching)
+client = discord.Client(intents=intents, activity=activity)
 
 # Predefined commands 
 opening_command = '!bagn'
@@ -51,36 +58,6 @@ embed_msg.add_field(
     inline=False
 )
 
-
-# Help function, just return the embed msg and relax
-def help_function():
-    return embed_msg
-
-def templates_function():
-    return 'Templates List function called'
-
-def describe_template():
-    return 'Template description summoned'
-
-def wrong_command_try_again():
-    return 'Wrong command bitch, try again'
-
-
-class ChooseAction(Enum):
-    # Help command, describe how !bagn command works 
-    helpfunction = (help_function,)
-    # Describe template command, gives details about given template name
-    describefunction = (describe_template,)
-    # Lists available meme templates - this would need pagination later @Todo: think about reply's length
-    templatesfunction = (templates_function,)
-    # Just incase we enter wrong commands 
-    wrongnessfunction = (wrong_command_try_again,)
-
-    # Now based on class's enum selection, we'll be able to call corresponding function
-    # that's cool 
-    def __call__(self, *args, **kwargs):
-        return self.value[0](*args, **kwargs)
-
 # Then we define events, and based on those events, interaction
 @client.event 
 async def on_ready():
@@ -99,16 +76,16 @@ async def on_message(message):
         # opening_command help|describe|templates|<template_name> [Args, either Optional or required, based on template]
         # received commands length has to be 2 or more. Ex: !bagn help 
         if len(received_commands) < 2:
-            await message.channel.send(ChooseAction.wrongnessfunction())
+            await message.channel.send('Todo - simple usage embed')
             return
 
         # now check second command and call related functions accordingly 
         if received_commands[1].lower() == 'help':
-            await message.channel.send('A Cry fo help!', embed=ChooseAction.helpfunction())
+            await message.channel.send('A Cry fo help!', embed=embed_msg)
         elif received_commands[1].lower() == 'describe':
-            await message.channel.send(ChooseAction.describefunction())
+            await message.channel.send('Todo - take args, check templates list')
         elif received_commands[1].lower() == 'templates':
-            await message.channel.send(ChooseAction.templatesfunction())
+            await message.channel.send('Todo - return templates list - fidn a better way to present images')
         else:
             # take meme template name
             meme_template_name = received_commands[1].lower()
