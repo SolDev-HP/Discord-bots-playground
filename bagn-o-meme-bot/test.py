@@ -28,6 +28,21 @@ client = discord.Client(intents=intents, activity=activity)
 
 # Predefined commands 
 opening_command = '!bagn'
+# MemeTemplates dict 
+memetemplates = {}
+# Whackiness comes from here 
+whackyreplies = [
+    'I wanna be a cowboy, so I can run away from here',
+    'Get ready to be disappointed like your parents',
+    '[Landlord] Where\'s mah money at chigga, [Louz] I don\'t kno...',
+    'It\'s always delightful when someone calls me. Except you bitch, you a cockroach',
+    'Do ya brain even braincell bro?!',
+    'Tell me to chill and calling me kiddo! Fck You',
+    'I don\'t think you\'re acting stupid. I think it\'s totally a real thing',
+    'Bilbo gave me an eDick so I can fck ya up!',
+    'Zigzaggin through life ya luuuzer. Hop on the ride'
+]
+
 
 # ------------------------------------- !bagn help embed <start> ----------------------------------------
 # opening_command help|describe|templates|<template_name> [Args, either Optional or required, based on template]
@@ -60,20 +75,6 @@ embed_describetemplate = discord.Embed(
     color=discord.Color.blue()
 )
 
-# MemeTemplates dict 
-memetemplates = {}
-# Whackiness comes from here 
-whackyreplies = [
-    'I wanna be a cowboy, so I can run away from here',
-    'Get ready to be disappointed like your parents',
-    '[Landlord] Where\'s mah money at chigga, [Louz] I don\'t kno...',
-    'It\'s always delightful when someone calls me. Except you bitch, you a cockroach',
-    'Do ya brain even braincell bro?!',
-    'Tell me to chill and calling me kiddo! Fck You',
-    'I don\'t think you\'re acting stupid. I think it\'s totally a real thing',
-    'Bilbo gave me an eDick so I can fck ya up!',
-    'Zigzaggin through life ya luuuzer. Hop on the ride'
-]
 
 def prep_helpmsg_embed(): 
     global embed_helpmsg  
@@ -134,11 +135,24 @@ def prep_templateslist_embed():
         embed_templateslist.add_field(name=memeobj, value='Total: ' + str(len(total_fields)) + ' Req: ' + str(required_fields), inline=True)
 
 # function to get the given template. Take the arg from 
+# Expect this to return the embed that we want to use
 def prep_describe_template_embed(template_name):
     global embed_describetemplate
     # Reprep Title 
     embed_describetemplate.title = '[ ' + str(template_name).lower() + ' ] - Meme Template usage details'
-    # 
+    # Check if we have this template 
+    for template in memetemplates:
+        if template_name == str(template).lower():
+            pass # do something here as we found it - potentially return 
+
+    # If we reach here, it means we didn't find the template 
+    # Prepare error spittin embed 
+    embed_templateNotFound = discord.Embed(
+        title='',
+        description='',
+        color=''
+    )
+    ## Add related fields and return this embed to be sent back
 
 # Then we define events, and based on those events, interaction
 @client.event 
