@@ -18,10 +18,43 @@ client = discord.Client(intents=intents)
 opening_command = '!bagn'
 
 # opening_command help|describe|templates|<template_name> [Args, either Optional or required, based on template]
+# !bagn help embed, only be doing this once and reply the same embed 
+# Create discord embed for help details 
+embed_msg = discord.Embed(
+    title='Bagn0Meme Bot HelpLine',
+    description='Bagn0Meme bot helpline, details on how to use this shitpretzel',
+    color=discord.Color.green()
+)
+    
+# Setting the baseline 
+embed_msg.set_author(name="Bagn0Meme Bot")
+#embed_msg.set_thumbnail(url='./generated_memes/meme.png')
+embed_msg.add_field(name='**Usage**', value='!bagn help|describe|templates|<template_name> [arguments (if any)]', inline=False)
+# Explain help command 
+embed_msg.add_field(name='!bagn help', value='Displays these details about how to use this nutsuckler', inline=False)
+# Explain templates command
+embed_msg.add_field(
+    name='!bagn templates',
+    value='List of all available templates at the moment. Ever growing, ever expanding.',
+    inline=False
+)
+# Explain describe command 
+embed_msg.add_field(
+    name='!bagn describe <template_name>', 
+    value='Describes the template. Some templates have required fields and some dont.\n This command describes how a template can be used',
+    inline=False
+)
+# Explain the main meme command 
+embed_msg.add_field(
+    name='!bagn <template_name> <template_args>',
+    value='This is how you meme madafaka. Select the template that you like and meme it out. Currently we support adding/replace text from certain point. Later we can add username tags, and sntching their dp and add it properly within the template',
+    inline=False
+)
 
 
+# Help function, just return the embed msg and relax
 def help_function():
-    return 'Help function called'
+    return embed_msg
 
 def templates_function():
     return 'Templates List function called'
@@ -76,7 +109,7 @@ async def on_message(message):
 
         # now check second command and call related functions accordingly 
         if received_commands[1].lower() == 'help':
-            await message.channel.send(ChooseAction.helpfunction())
+            await message.channel.send('A Cry fo help!', embed=ChooseAction.helpfunction())
         elif received_commands[1].lower() == 'describe':
             await message.channel.send(ChooseAction.describefunction())
         elif received_commands[1].lower() == 'templates':
