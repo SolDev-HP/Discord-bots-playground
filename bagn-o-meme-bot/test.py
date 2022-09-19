@@ -59,9 +59,6 @@ def help_function():
 def templates_function():
     return 'Templates List function called'
 
-def meme_template_function():
-    return 'Trying to meme here '
-
 def describe_template():
     return 'Template description summoned'
 
@@ -76,8 +73,6 @@ class ChooseAction(Enum):
     describefunction = (describe_template,)
     # Lists available meme templates - this would need pagination later @Todo: think about reply's length
     templatesfunction = (templates_function,)
-    # Main meme command
-    memefunction = (meme_template_function,)
     # Just incase we enter wrong commands 
     wrongnessfunction = (wrong_command_try_again,)
 
@@ -115,8 +110,16 @@ async def on_message(message):
         elif received_commands[1].lower() == 'templates':
             await message.channel.send(ChooseAction.templatesfunction())
         else:
-            # Whatever this is, should be considered potential meme-template name 
-            await message.channel.send(ChooseAction.memefunction())
+            # take meme template name
+            meme_template_name = received_commands[1].lower()
+            # Check if it's present within currently available templates 
+            # << Check Check >>
+            # Check required args Optional + Required 
+            # << Check Check 2 >>
+            # Generate using MemePy.save_meme_to_disk 
+
+            # Refund.... I mean, return 
+            await message.channel.send('---- Currently Under Construction --- ')
 
         # # It has to start with !bagn or any other predefined command 
         # # Clear path - if meme.png exists, delete it 
@@ -154,16 +157,5 @@ async def on_message(message):
 
     if 'bitch' in message.content:
         await message.channel.send('Wooaahh there cowboy. Eeassyy there!')
-
-    # So MemePy works with these arguments
-    # MemePy <path> <template> <*args> <*options>
-
-    # path - where you'll be storing generated memes 
-    # template - predefined templates present in MemePy library - Details in MemePy/Resources/MemeLibrary/builtin.JSON
-    # args - all the arguments that are placed onto the template 
-    # options - Options are passed with {} - supported option is stretch 
-
-
-
 
 client.run(os.getenv("DISCORD_TOKEN_DEV_SERVER"))
