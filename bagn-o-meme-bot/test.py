@@ -1,7 +1,10 @@
 # we import discordpy and specify intent. Intents are passed on when we create a client 
 # In this intent, we will specify that we expect message with contents
 
+from cgitb import grey
 from enum import Enum
+from random import seed
+from random import randint 
 import discord 
 import MemePy
 from MemePy.MemeLibJsonDecoder import generate_standard_meme_dict
@@ -50,10 +53,27 @@ embed_templateslist = discord.Embed(
     description='List of meme templates available in this shitpretzel\'s underpants. More to come...',
     color=discord.Color.blurple() 
 )
+# Describe a template msg embed 
+embed_describetemplate = discord.Embed(
+    title='Meme Template Description',
+    description='Spillin some wisdom from mah cup, don\'t get caught sleepin bitchh!!',
+    color=discord.Color.blue()
+)
 
 # MemeTemplates dict 
 memetemplates = {}
-
+# Whackiness comes from here 
+whackyreplies = [
+    'I wanna be a cowboy, so I can run away from here',
+    'Get ready to be disappointed like your parents',
+    '[Landlord] Where\'s mah money at chigga, [Louz] I don\'t kno...',
+    'It\'s always delightful when someone calls me. Except you bitch, you a cockroach',
+    'Do ya brain even braincell bro?!',
+    'Tell me to chill and calling me kiddo! Fck You',
+    'I don\'t think you\'re acting stupid. I think it\'s totally a real thing',
+    'Bilbo gave me an eDick so I can fck ya up!',
+    'Zigzaggin through life ya luuuzer. Hop on the ride'
+]
 
 def prep_helpmsg_embed(): 
     global embed_helpmsg  
@@ -82,15 +102,23 @@ def prep_helpmsg_embed():
         inline=False
     )
 
-def prep_wrongusage_embed():
+def prep_wrongusage_embed(which_command):
     global embed_wrongusage
-    embed_wrongusage.add_field(
-        name='**Lolipop for the Nicklodian gang**', 
-        value='!bagn help|describe|templates|<template_name> [arguments (if any)]', 
-        inline=False
-    )
+    embed_wrongusage.clear_fields()
+    if which_command == 'general':
+        embed_wrongusage.add_field(
+            name='**Lolipop for the Nicklodian gang**', 
+            value='!bagn help|describe|templates|<template_name> [arguments (if any)]', 
+            inline=False
+        )
+    else:
+        embed_wrongusage.add_field(
+            name='**Lolipop for the Nicklodian gang**', 
+            value='!bagn describe <template_name>', 
+            inline=False
+        )
 
-# Def the list of templates available, returns a dictionary with name => usage 
+# Def the list of templates available, returns a dictionary with name => elements (required + optional) 
 def prep_templateslist_embed():
     # Prepares a dict
     global memetemplates
@@ -105,6 +133,12 @@ def prep_templateslist_embed():
         required_fields = memeImageObj.count_non_optional()
         embed_templateslist.add_field(name=memeobj, value='Total: ' + str(len(total_fields)) + ' Req: ' + str(required_fields), inline=True)
 
+# function to get the given template. Take the arg from 
+def prep_describe_template_embed(template_name):
+    global embed_describetemplate
+    # Reprep Title 
+    embed_describetemplate.title = '[ ' + str(template_name).lower() + ' ] - Meme Template usage details'
+    # 
 
 # Then we define events, and based on those events, interaction
 @client.event 
@@ -112,12 +146,11 @@ async def on_ready():
     # Prepare embeds here 
     print('Preparing Help embed msg')
     prep_helpmsg_embed()
-    print('Preparing wrong usage embed')
-    prep_wrongusage_embed()
     print('Preparing templates list embed')
     prep_templateslist_embed()
     # Prepare meme dictionaries here, later when dict gets updated, we can call related method to get latest data 
-
+    # Prepare randomness seed 
+    seed(time.time())
     print(f'We have logged in as {client.user}')
 
 @client.event 
@@ -130,19 +163,30 @@ async def on_message(message):
         # Check which command we received 
         received_commands = message.content.split()
 
+        # Give me randomnessss 
+        pickup_line = randint(0, len(whackyreplies) - 1)
         # opening_command help|describe|templates|<template_name> [Args, either Optional or required, based on template]
         # received commands length has to be 2 or more. Ex: !bagn help 
         if len(received_commands) < 2:
-            await message.channel.send(embed=embed_wrongusage)
+            prep_wrongusage_embed('general')
+            await message.channel.send(whackyreplies[pickup_line], embed=embed_wrongusage)
             return
 
         # now check second command and call related functions accordingly 
         if received_commands[1].lower() == 'help':
-            await message.channel.send('A Cry fo help!', embed=embed_helpmsg)
+            await message.channel.send(whackyreplies[pickup_line], embed=embed_helpmsg)
         elif received_commands[1].lower() == 'describe':
-            await message.channel.send('Todo - take args, check templates list')
+            # Do we have template_name as arg?
+            if(len(received_commands) <= 2):
+                # We don't have template name - have it known!
+                prep_wrongusage_embed('describe')
+                await message.channel.send('Describe what? My jingdingler?', embed=embed_wrongusage)
+            else:
+                # So we have a template name now, send this name to preparator
+                prep_describe_template_embed(received_commands[2])
+                await message.channel.send(whackyreplies[pickup_line], embed=embed_describetemplate)
         elif received_commands[1].lower() == 'templates':
-            await message.channel.send('Things to fuck around with', embed=embed_templateslist)
+            await message.channel.send(whackyreplies[pickup_line], embed=embed_templateslist)
         elif received_commands[1].lower() == 'testit':
             await message.channel.send('Check console debug')
         else:
