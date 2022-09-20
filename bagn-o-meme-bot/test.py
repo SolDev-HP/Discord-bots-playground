@@ -1,11 +1,9 @@
 # we import discordpy and specify intent. Intents are passed on when we create a client 
 # In this intent, we will specify that we expect message with contents
 
-from cgitb import grey
 from enum import Enum
 from random import seed
 from random import randint
-from tkinter import W 
 import discord 
 import MemePy
 from MemePy.MemeLibJsonDecoder import generate_standard_meme_dict
