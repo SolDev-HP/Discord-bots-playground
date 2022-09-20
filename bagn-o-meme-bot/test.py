@@ -4,7 +4,8 @@
 from cgitb import grey
 from enum import Enum
 from random import seed
-from random import randint 
+from random import randint
+from tkinter import W 
 import discord 
 import MemePy
 from MemePy.MemeLibJsonDecoder import generate_standard_meme_dict
@@ -294,53 +295,66 @@ async def on_message(message):
         else:
             # take meme template name
             meme_template_name = received_commands[1].lower()
-            print(memetemplates.keys())
+
             # Check if it's present within currently available templates 
             if meme_template_name not in list(map(lambda name: name.lower(), memetemplates.keys())):
-                await message.channel.send('------- Can\'t find it bruv')
+                await message.channel.send(whackyreplies[pickup_line] + ' \n[Template Not Found]')
                 return
             # Check required args Optional + Required 
-            # << Check Check 2 >>
-            # Generate using MemePy.save_meme_to_disk 
+            for meme_name in memetemplates:
+                if meme_name.lower() == meme_template_name:
+                    memeImageObj = memetemplates[meme_name]
+                    required_fields = memeImageObj.count_non_optional()
+                    
+                    # Check if we received enough args
+                    if len(message.content.split(' ', 2)) <= 2:
+                        # Args not received
+                        await message.channel.send(whackyreplies[pickup_line] + ' \n[Not Enough Args]')
+                        return 
+                    
+                    str_args = message.content.split(' ', 2)[2]
+                    
+                    # Now we need to split this with + and see if we have received 
+                    # arguments as much as required_field states 
+                    splitted_args = str_args.split('+')
+                    if len(splitted_args) != required_fields:
+                        # So we don't have enough args received 
+                        await message.channel.send(whackyreplies[pickup_line] + ' \n[Not Enough Args]')
+                        return 
 
-            # Refund.... I mean, return 
-            await message.channel.send('---- Currently Under Construction --- ')
+                    # Delete previously created meme.png and meme.jpg 
+                    if Path('./generated_memes/meme.png').exists():
+                        os.remove('./generated_memes/meme.png')
+                    if Path('./generated_memes/meme.jpg').exists():
+                        os.remove('./generated_memes/meme.jpg')
+                    # Now that we've made sure of everything, generate the meme and respond 
+                    # <Generate Generate>
+                    memeObj = MemePy.save_meme_to_disk(
+                        meme_name,
+                        './generated_memes', 
+                        splitted_args
+                    )
 
-        # # It has to start with !bagn or any other predefined command 
-        # # Clear path - if meme.png exists, delete it 
-        # if(os.path.exists('./generated_memes/meme.png')):
-        #     os.remove('./generated_memes/meme.png')
-        
-        # # MemePy expects args, let's provide following and see what happens
-        # # template = 'MeAlsoMe'     - Things are case sensetive here 
-        # # path = ./generated_memes dir 
-        # # args = depending upon the meme template 
+                    memefilename = ''
+                    # Do this, but better, this is 3 time copying this block
+                    # @Todo: Find a better way to do this
+                    if Path('./generated_memes/meme.png').exists():
+                        memefilename += './generated_memes/meme.png'
+                    if Path('./generated_memes/meme.jpg').exists():
+                        memefilename += './generated_memes/meme.jpg'
 
-        # # Options = None at this time
-        # memeObj = MemePy.save_meme_to_disk(
-        #     'MeAlsoMe',
-        #     './generated_memes', [
-        #         'Flip burgers',
-        #         'into Bagners'
-        #     ]
-        # )
-
-        # # As MemePy creates meme.png file, we need to rename it to something 
-        # # we take that filename that's eventually be passed into discord.File() 
-        # # Later we can use this to delete the temp file that we created - Depends, do we wanna keep them?
-        # memefilename = './generated_memes/meme.png'
-
-        # # Now it requires two more things, depending upon which meme template is selected 
-        # # you need text args 
-        # #- ----- Scratch that and now get file object from discord 
-        # # need an fp?
-        # fp = open(memefilename, 'rb')
-        # discfile = discord.File(fp=fp, filename=memefilename, spoiler=False, description='Return of the meme')
-        # fp.close()
-        # # Returning result would be an image 
-        # await message.channel.send('Here ya go cowboy', file=discfile)
-
+                    # # Now it requires two more things, depending upon which meme template is selected 
+                    # # you need text args 
+                    # #- ----- Scratch that and now get file object from discord 
+                    # # need an fp?
+                    fp = open(memefilename, 'rb')
+                    discfile = discord.File(fp=fp, filename=memefilename, spoiler=False, description='Return of the meme')
+                    fp.close()
+                    # Returning result would be an image 
+                    await message.channel.send(whackyreplies[pickup_line], file=discfile)
+                    break
+            
     if 'bitch' in message.content:
-        await message.channel.send('Wooaahh there cowboy. Eeassyy there!')
+        await message.channel.send('Wooaahh cowboy. Eeassyy there!')
 
 client.run(os.getenv("DISCORD_TOKEN_DEV_SERVER"))
